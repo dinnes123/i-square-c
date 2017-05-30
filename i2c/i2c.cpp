@@ -1,50 +1,49 @@
- #include "Keyboard_small.h" //include the declaration for this class
-keyboards::keyboards()
+ #include "i2c.h" //include the declaration for this class
+i2c::i2c()
               {
-              
+                  Wire.begin(); // join i2c bus (address optional for master)
               }
-               
-keyboards::~keyboards()
+i2c::~i2c()
               {
-                  
               }
-char keyboards::key_get_value()
-              {
-              
-              byte ROWS = 4; // 4 Rows
-              byte COLS = 3; // 3 Columns
-                char keys[ROWS][COLS] = 
+int i2c::sent(int address)
+                  {
+                          Wire.begin();
+                        Wire.beginTransmission(address); // transmit to device #8
+                        for(int i=0;i<packet_size;i++)
+                            {
+                                 Wire.write(sent_packet[i]);
+                            }
+                        Wire.endTransmission();    // stop transmitting  
+                  }
+int i2c::receive(int address)
+                  {
+                             Wire.begin();
+                       Wire.begin(address);                
+                       Wire.onReceive(i2c::receiveEvent);
+                       Serial.print("");
+                       while (Wire.available()>packet_size-1) 
+                              { 
+                                     for(int i=0;i<packet_size;i++)
+                                        {
+                                            receive_packet[i]=Wire.read();
+                                            //Serial.println(receive_packet[i]);
+                                        }
+                                    if(receive_packet[0]!=0xa)
+                                    return receive(address);
+                                    else
+                                    return 1;
+                               }
+                      return receive(address);
+                  }
+int i2c::show()
+    {
+         /*for(int i=0;i<packet_size;i++)
                                     {
-                                          {'1','2','3'},
-                                          {'4','5','6'},
-                                          {'7','8','9'},
-                                          {'*','0','#'}
-                                    };
-                                    // 定義 Keypad 連到 Arduino 的接腳
-                                  byte rowPins[ROWS] = {9, 8, 7, 6}; // 連到 Keypad 的 4 個 Rows: Row0, Row1, Row2, Row3 
-                                  byte colPins[COLS] = {12, 11, 10};   // 連到 Keypad 的 3 個 Columns: Column0, Column1, Column2
-                                  // 建立 Keypad 物件              Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
-                                  Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );       
-
-                  
-                   char key = keypad.getKey();
-                  
-                    //Serial.print("key=");Serial.println(key);
-                  // NO_KEY 代表沒有按鍵被按下
-                  if (key != NO_KEY)
-                              {
-                                 
-                                 if(key!=42)
-                                            {
-                                              // Serial.println(key);
-                                               return key-48;
-                                             }
-                                 //Serial.println(key);
-                                 return '*';
-                              }
-                    else      {
-                                   //key=0;
-                                   //Serial.print("key2=");Serial.println(key);
-                                  return key;
-                              }
-              }
+                                       Serial.print( receive_packet_BACK_UP[i]);Serial.print(" ");
+                                    }
+         Serial.println(" ");*/
+    }
+void static i2c::receiveEvent(int howMany) 
+     {
+     }
